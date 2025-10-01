@@ -35,13 +35,11 @@ target_link_libraries(your_app PRIVATE autograd::autograd)
 
 ---
 
-# FluxCore - High-Performance Automatic Differentiation for C++
-
 ## The Mathematics of Automatic Differentiation
 
 ### Why Computational Graphs?
 
-In scientific computing, machine learning, and optimization, we constantly need derivatives. Whether training neural networks, solving differential equations, or optimizing engineering designs, the ability to compute gradients efficiently and accurately is fundamental. FluxCore provides a high-performance C++ library for automatic differentiation through computational graphs.
+In scientific computing, machine learning, and optimization, we constantly need derivatives. Whether training neural networks, solving differential equations, or optimizing engineering designs, the ability to compute gradients efficiently and accurately is fundamental. autograd-cpp provides a high-performance C++ library for automatic differentiation through computational graphs.
 
 ### The Computational Graph
 
@@ -264,7 +262,7 @@ A fast, CPU-optimized automatic differentiation library designed for efficiency 
 - **OpenMP Parallel**: Multi-threaded operations
 - **Quantization**: INT8 and BF16 support for 4x-2x memory reduction
 
-## Why FluxCore?
+## Why autograd-cpp?
 
 1. **Run Anywhere**: Works on any x86_64 CPU from 2001 onwards (SSE2 baseline)
 2. **Memory Efficient**: Run 10M parameter models in ~10MB RAM with INT8
@@ -274,9 +272,9 @@ A fast, CPU-optimized automatic differentiation library designed for efficiency 
 ## Quick Start
 
 ```cpp
-#include <fluxcore/fluxcore.hpp>
+#include <autograd/autograd.hpp>
 
-using namespace fluxcore;
+using namespace autograd;
 
 // Simple gradient computation
 auto x = tensor({2, 3}, requires_grad=true);
@@ -366,19 +364,19 @@ On a 2015 laptop (Intel i5, no GPU):
 
 ### Header-only usage
 ```cpp
-#include <fluxcore/fluxcore.hpp>
+#include <autograd/autograd.hpp>
 ```
 
 ### With CMake
 ```cmake
-find_package(fluxcore)
-target_link_libraries(your_app fluxcore::fluxcore)
+find_package(autograd)
+target_link_libraries(your_app autograd::autograd)
 ```
 
 ### From source
 ```bash
-git clone https://github.com/queelius/fluxcore.git
-cd fluxcore
+git clone https://github.com/queelius/autograd.git
+cd autograd
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j
@@ -393,7 +391,7 @@ sudo make install
 
 ## Design Philosophy
 
-FluxCore is designed to be:
+autograd-cpp is designed to be:
 
 - **Efficient**: Every byte and cycle matters
 - **Portable**: Run on any CPU from the last 20 years
@@ -414,11 +412,11 @@ Contributions welcome! Areas of interest:
 
 ## Citation
 
-If you use FluxCore in research, please cite:
+If you use autograd-cpp in research, please cite:
 ```
-@software{fluxcore2024,
-  title = {FluxCore: High-Performance Automatic Differentiation for C++},
+@software{autograd2024,
+  title = {autograd-cpp: High-Performance Automatic Differentiation for C++},
   year = {2024},
-  url = {https://github.com/yourusername/fluxcore}
+  url = {https://github.com/yourusername/autograd}
 }
 ```
