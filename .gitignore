@@ -54,6 +54,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-# Test binaries
+# Test binaries (but keep test source files)
 test_*
 !test_*.cpp
+!test_*.hpp
