@@ -1,3 +1,40 @@
+# autograd-cpp - High-Performance Automatic Differentiation for C++
+
+## Using in Your Project
+
+### CMake FetchContent (Recommended)
+
+Add this to your `CMakeLists.txt`:
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+    autograd_cpp
+    GIT_REPOSITORY https://github.com/queelius/autograd-cpp.git
+    GIT_TAG main
+)
+
+# Disable examples when using as dependency
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(autograd_cpp)
+
+# Link to your target
+target_link_libraries(your_app PRIVATE autograd::autograd)
+```
+
+### Using find_package
+
+After installation:
+```cmake
+find_package(autograd_cpp REQUIRED)
+target_link_libraries(your_app PRIVATE autograd::autograd)
+```
+
+---
+
 # FluxCore - High-Performance Automatic Differentiation for C++
 
 ## The Mathematics of Automatic Differentiation
