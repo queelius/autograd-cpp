@@ -84,19 +84,35 @@ public:
     // Constructor from data
     Tensor(const float* data_ptr, std::initializer_list<size_t> shape_init, bool requires_grad = true)
         : _shape(shape_init), requires_grad(requires_grad), is_leaf(true) {
-        
+
         _size = 1;
         for (auto s : _shape) _size *= s;
-        
+
         compute_strides();
-        
+
         data = static_cast<float*>(std::aligned_alloc(32, _size * sizeof(float)));
         grad = static_cast<float*>(std::aligned_alloc(32, _size * sizeof(float)));
-        
+
         std::memcpy(data, data_ptr, _size * sizeof(float));
         std::memset(grad, 0, _size * sizeof(float));
     }
-    
+
+    // Constructor from data with vector shape
+    Tensor(const float* data_ptr, const std::vector<size_t>& shape_vec, bool requires_grad = true)
+        : _shape(shape_vec), requires_grad(requires_grad), is_leaf(true) {
+
+        _size = 1;
+        for (auto s : _shape) _size *= s;
+
+        compute_strides();
+
+        data = static_cast<float*>(std::aligned_alloc(32, _size * sizeof(float)));
+        grad = static_cast<float*>(std::aligned_alloc(32, _size * sizeof(float)));
+
+        std::memcpy(data, data_ptr, _size * sizeof(float));
+        std::memset(grad, 0, _size * sizeof(float));
+    }
+
     ~Tensor() {
         std::free(data);
         std::free(grad);
@@ -201,6 +217,59 @@ inline TensorPtr randn(std::initializer_list<size_t> shape, float mean = 0, floa
 
 inline TensorPtr from_vector(const std::vector<float>& vec, std::initializer_list<size_t> shape, bool requires_grad = true) {
     return std::make_shared<Tensor>(vec.data(), shape, requires_grad);
+}
+
+// Overload that accepts vector<size_t> for shape
+inline TensorPtr from_vector(const std::vector<float>& vec, const std::vector<size_t>& shape, bool requires_grad = true) {
+    return std::make_shared<Tensor>(vec.data(), shape, requires_grad);
+}
+
+// Create tensor of zeros with same shape as input
+inline TensorPtr zeros_like(TensorPtr x, bool requires_grad = true) {
+    return std::make_shared<Tensor>(std::vector<size_t>(x->shape()), requires_grad);
+}
+
+// Create tensor of ones with same shape as input
+inline TensorPtr ones_like(TensorPtr x, bool requires_grad = true) {
+    auto t = std::make_shared<Tensor>(std::vector<size_t>(x->shape()), requires_grad);
+    t->fill(1.0f);
+    return t;
+}
+
+// Free function transpose for 2D tensors (swaps dim 0 and dim 1)
+inline TensorPtr transpose(TensorPtr x) {
+    if (x->ndim() != 2) {
+        throw std::runtime_error("transpose expects a 2D tensor");
+    }
+
+    size_t rows = x->shape()[0];
+    size_t cols = x->shape()[1];
+
+    auto out = std::make_shared<Tensor>(std::initializer_list<size_t>{cols, rows}, x->requires_grad);
+    out->children = {x};
+    out->is_leaf = false;
+
+    // Forward pass: transpose the matrix
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            out->data[j * rows + i] = x->data[i * cols + j];
+        }
+    }
+
+    // Backward pass: transpose the gradient
+    if (out->requires_grad) {
+        out->backward_fn = [x, out, rows, cols]() {
+            if (x->requires_grad) {
+                for (size_t i = 0; i < rows; ++i) {
+                    for (size_t j = 0; j < cols; ++j) {
+                        x->grad[i * cols + j] += out->grad[j * rows + i];
+                    }
+                }
+            }
+        };
+    }
+
+    return out;
 }
 
 } // namespace autograd
