@@ -59,10 +59,54 @@ int main() {
 ## Core Components
 
 - **`tensor.hpp`**: Tensor class with gradient tracking
-- **`ops.hpp`**: Operations (add, mul, exp, log, matmul, etc.)
+- **`ops.hpp`**: Operations (add, mul, exp, log, matmul, cholesky, solve_triangular, etc.)
 - **`jacobian.hpp`**: Jacobian matrix computation
 - **`hessian.hpp`**: Hessian matrix computation
 - **`optim.hpp`**: SGD optimizer with learning rate schedules
+
+### Broadcasting Support
+
+Binary operations support scalar broadcasting - when one operand has size 1, it broadcasts to match the other:
+
+```cpp
+auto x = randn({100, 3});        // [100, 3] tensor
+auto bias = from_vector({1.0f}, {1});  // scalar [1]
+auto result = add(x, bias);      // bias broadcasts to [100, 3]
+```
+
+Operations with broadcasting: `add`, `sub`, `mul`, `div`, `minimum`, `maximum`
+
+### Helper Functions
+
+```cpp
+auto x = randn({3, 4});
+auto z = zeros_like(x);          // Same shape as x, filled with 0
+auto o = ones_like(x);           // Same shape as x, filled with 1
+auto xT = transpose(x);          // Transpose 2D tensor with gradient support
+```
+
+### Linear Algebra Operations (New!)
+
+The library now includes advanced linear algebra operations with full gradient support:
+
+- **`cholesky(A, lower)`**: Cholesky decomposition for positive-definite matrices
+- **`solve_triangular(A, b, lower, transpose)`**: Solve triangular systems Ax = b
+
+These enable efficient implementation of:
+- Multivariate normal distributions
+- Gaussian process regression
+- Linear mixed models
+- Kalman filtering
+
+Example usage:
+```cpp
+// Solve Ax = b using Cholesky decomposition
+auto L = cholesky(A, true);                    // A = LL^T
+auto y = solve_triangular(L, b, true, false);  // Solve Ly = b
+auto x = solve_triangular(L, y, true, true);   // Solve L^Tx = y
+```
+
+See `examples/mvn_example.cpp` for a complete multivariate normal distribution implementation.
 
 ## Building Examples
 
